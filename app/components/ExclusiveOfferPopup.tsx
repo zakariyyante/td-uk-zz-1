@@ -1,0 +1,140 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { X } from 'lucide-react';
+import { Casino } from '../data/casinos';
+import { Star } from 'lucide-react';
+import { logos } from './CasinoLogos';
+import Image from 'next/image';
+
+interface ExclusiveOfferPopupProps {
+  casino: Casino;
+  isOnline: boolean;
+  gclidValue?: string;
+  countryCode?: string;
+}
+
+export default function ExclusiveOfferPopup({ casino, isOnline, gclidValue = '', countryCode }: ExclusiveOfferPopupProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const casinoUrl = gclidValue ? `${casino.url}&gclid=${gclidValue}` : casino.url;
+
+  useEffect(() => {
+    const alreadyShown = sessionStorage.getItem('exclusiveOfferShown');
+    if (alreadyShown) {
+      return;
+    }
+
+    if (!isOnline) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+      sessionStorage.setItem('exclusiveOfferShown', 'true');
+    }, 12000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [isOnline]);
+
+  const handleClose = () => {
+    setIsVisible(false);
+    sessionStorage.setItem('exclusiveOfferShown', 'true');
+  };
+
+  const handleOverlayClick = () => {
+    handleClose();
+  };
+
+  const handleContentClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+  };
+
+  const renderStars = (rating: number) => (
+    <div className="flex gap-0.5">
+      {[...Array(5)].map((_, i) => (
+        <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+      ))}
+    </div>
+  );
+
+  const renderLogo = () => {
+    if (typeof casino.logo === 'string' && casino.logo.startsWith('/')) {
+      return (
+        <Image
+          src={casino.logo}
+          alt={`${casino.name} Casino`}
+          width={200}
+          height={80}
+          className="w-full h-full object-contain"
+        />
+      );
+    }
+    return logos[casino.logo as keyof typeof logos];
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={handleOverlayClick}
+    >
+      <div
+        className="relative casino-card-bg rounded-2xl shadow-2xl border border-amber-500/30 max-w-md w-full overflow-hidden casino-glow"
+        onClick={handleContentClick}
+      >
+        <button
+          onClick={handleClose}
+          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-black/70 hover:bg-black/90 flex items-center justify-center transition-colors border border-amber-500/20"
+          aria-label="Close popup"
+        >
+          <X className="w-5 h-5 text-amber-200" />
+        </button>
+
+        <div className="relative mb-4 -mt-2">
+          <div className="relative bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-black font-bold text-center py-3 px-8 mx-4 rounded-sm">
+            <div className="absolute left-0 top-0 w-0 h-0 border-t-[12px] border-t-amber-500 border-b-[12px] border-b-amber-500 border-r-[20px] border-r-transparent transform translate-x-[-20px]"></div>
+            <div className="absolute right-0 top-0 w-0 h-0 border-t-[12px] border-t-amber-500 border-b-[12px] border-b-amber-500 border-l-[20px] border-l-transparent transform translate-x-[20px]"></div>
+            <span className="relative z-10 text-sm sm:text-base uppercase tracking-wide font-extrabold">
+              EXCLUSIVE OFFER
+            </span>
+          </div>
+        </div>
+
+        <div className="px-6 pb-6">
+          <div className="flex justify-center mb-4">
+            <div className="bg-amber-500/5 rounded-2xl p-4 border border-amber-500/15">
+              <div className="w-48 h-20 flex items-center justify-center">
+                {renderLogo()}
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mb-4 space-y-1">
+          {casino.bonus.includes('+') && (
+            <p className="text-white font-extrabold text-lg sm:text-xl bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-md inline-block whitespace-normal break-words text-center">
+              {casino.bonus}
+            </p>
+          )}
+          </div>
+
+          <div className="flex items-center justify-center gap-2 mb-6">
+            {renderStars(casino.rating)}
+          </div>
+
+          <a
+            href={casinoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleClose}
+            className="block w-full bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-black font-extrabold py-3 px-6 rounded-xl text-center text-lg uppercase tracking-wide transition-all duration-300 shadow-lg hover:shadow-amber-500/25 hover:from-amber-500 hover:via-amber-400 hover:to-amber-500"
+          >
+            PLAY NOW
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
