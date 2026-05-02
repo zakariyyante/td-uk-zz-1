@@ -3,8 +3,8 @@ import Logo from '../components/Logo';
 import Link from 'next/link';
 
 export const metadata = {
-  title: "Terms of Service - Casino Top Choices",
-  description: "Terms of Service for Casino Top Choices. Read our terms and conditions for using our casino comparison website.",
+  title: "Terms of Service - UK Betting Masters",
+  description: "Terms of Service for UK Betting Masters. Read our terms and conditions for using our sports betting comparison website.",
 };
 
 export default function TermsOfService() {

@@ -3,8 +3,8 @@ import Logo from '../components/Logo';
 import Link from 'next/link';
 
 export const metadata = {
-  title: "Privacy Policy - Casino Top Choices",
-  description: "Privacy Policy for Casino Top Choices. Learn how we collect, use, and protect your personal information.",
+  title: "Privacy Policy - UK Betting Masters",
+  description: "Privacy Policy for UK Betting Masters. Learn how we collect, use, and protect your personal information.",
 };
 
 export default function PrivacyPolicy() {
